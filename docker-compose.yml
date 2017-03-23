@@ -1,0 +1,10 @@
+version: '2'
+services:
+  jekyll:
+    container_name: oceanhub_jekyll
+    build: ./jekyll/.
+    ports:
+      - "23400:4000"
+    volumes:
+      - ./docs:/workdir
+    command: /bin/bash fake-daemon.sh
