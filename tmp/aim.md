@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Цель проекта
-permalink: /aim/
+title: О проекте
+permalink: /about/
 ---
 ![Океан]({{ site.url }}/assets/logo.png)
 ## Цель проекта
