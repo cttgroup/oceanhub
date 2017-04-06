@@ -16,7 +16,6 @@
 title: Океан
 email: ocean@domain.com
 description: > # this means to ignore newlines until "baseurl:"
-  В нашем проекте разрабатывается ряд технических решений, предназначенных для поиска и идентификаций в океане крупных скоплений промысловой рыбы с применением данных съемок спутниками дистанционного зондирования Земли.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  cttgroup
