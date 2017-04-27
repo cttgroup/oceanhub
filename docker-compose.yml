@@ -8,13 +8,3 @@ services:
     volumes:
       - ./docs:/workdir
     command: /bin/bash fake-daemon.sh
-  nginx:
-    container_name: oceanhub_nginx
-    build: ./nginx/.
-    ports:
-      - "21030:80"
-    volumes:
-      - ./workdir:/workdir
-    command: /bin/bash fake-daemon.sh
-    links:
-      - jekyll
