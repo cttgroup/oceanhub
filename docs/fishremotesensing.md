@@ -2,6 +2,7 @@
 layout: page
 title: fishremotesensing
 permalink: /fishremotesensing/
+---
 
 Методы дистанционного поиска промысловых рыбных скоплений
 
