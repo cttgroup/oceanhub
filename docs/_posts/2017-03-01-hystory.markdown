@@ -22,6 +22,9 @@ categories: current
 
 ![airplane1](/assets/PBY_Catalina_landing.jpg){:class="img-responsive"}
 
+![airplane1](/docs/assets/PBY_Catalina_landing.jpg){:class="img-responsive"}
+ oceanhub/docs/assets/PBY_Catalina_landing.jpg 
+
 ## Гидросамолет PBY5 Catalina
 
 С 1955 по 1969 г.  для этих целей используется двухмоторный самолет наземного базирования Ли-2. В дальнейшем авиасъемки морских  акваторий в интересах рыболовства преимущественно осуществлялись с самолета Ил-14 в основных рыбопромысловых районах Баренцева моря.  
