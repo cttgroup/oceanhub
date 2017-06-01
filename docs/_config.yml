@@ -32,8 +32,3 @@ exclude:
   - rundev.sh
   - fake-daemon.sh
   - _src/
-github_comments:
-  repo: cttgroup/oceanhub
-  branch: master
-  comment_template: comments.html
-  comments_template: comments.html
