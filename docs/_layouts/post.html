@@ -12,6 +12,12 @@ layout: default
     {{ content }}
   </div>
 
+  {% responses %}
+    <!-- Fill in this template to comment -->
+    {% response author="Your Name" email="your.email@example.com" date="YYYY-MM-DD HH:MM:SS" %}
+    {% endresponse %}
+  {% endresponses %}
+
   {% if site.disqus.shortname %}
     {% include disqus_comments.html %}
   {% endif %}
