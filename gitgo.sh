@@ -1,8 +1,15 @@
 #!/bin/bash
 
-COMMENT=$1
-# COMMENT=$@
-
-# echo $COMMENT
-git add . && git commit -a -m $COMMENT && git push && git status
+git add . 
+echo " "
+DATE=`date +%Y-%m-%d:%H:%M`
+git commit -a -m $DATE
+echo " "
+git push 
+echo " "
+echo "***************************************"
+echo "*************** STATUS ****************"
+echo "***************************************"
+git status
+echo " "
 
