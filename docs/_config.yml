@@ -16,7 +16,7 @@
 title: Океан
 # email: ocean@domain.com
 description: > # this means to ignore newlines until "baseurl:"
-baseurl: "/oceanhuben"
+baseurl: "/oceanhub"
 url: "https://cttgroup.github.io"
 github_username:  cttgroup
 
