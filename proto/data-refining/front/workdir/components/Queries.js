@@ -1,7 +1,4 @@
 import React from 'react'
-import {
-  // Grid, Row, Col,
-} from 'react-bootstrap'
 import ReactTable from 'react-table'
 import 'react-table/react-table.css'
 
@@ -22,7 +19,6 @@ export class Queries extends React.Component {
     Cement.XHRGet(
       Cement.HOST + '/dump/get/',
       function(data) {
-        // console.log('DATA', data);
         let table = {
           body: data,
           columns: [{

@@ -1,7 +1,6 @@
 import datetime
 import os
 import re
-# import redis
 import requests
 import subprocess
 import time
@@ -9,12 +8,10 @@ import time
 from celery.decorators import task
 from celery.utils.log import get_task_logger
 
-# from app.settings import MAX_WGET_WAIT
 from app.settings import zredis
 
 
 logger = get_task_logger(__name__)
-# r = redis.StrictRedis(host=REDIS_URL, port=REDIS_PORT, db=0)
 
 
 @task(name="Create modis quere")
@@ -35,7 +32,6 @@ def create_download_quere_task(
                 "date": datetime.datetime.strptime(date, "%Y-%m-%d"),
             }):
             out += download_task(serverURL, fileName, storePath)
-        # print("OUT:", out)
     return out
 
 

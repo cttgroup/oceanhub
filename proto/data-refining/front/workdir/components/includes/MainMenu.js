@@ -1,7 +1,5 @@
 import React from 'react'
 import {
-  // BrowserRouter as Router,
-  // Route,
   Link
 } from 'react-router-dom'
 import { Nav,
@@ -37,7 +35,6 @@ class MainMenu extends React.Component {
         className={className}
                      />)
     })
-              //<img src="/images/logosm.png" />
 
     return (<div className="Nav">
       <Navbar staticTop inverse>
@@ -59,21 +56,7 @@ class MainMenu extends React.Component {
       </Navbar>
     </div>)
   }
-            //<Navbar fixedTop={true}>
 }
-
-/*
-          <Nav>
-            <NavItem
-              // eventKey={this.props.key}
-              href=''
-              className=''
-            >
-              Авторизация
-            </NavItem>
-          </Nav>
-*/
-
 
 class MenuLink extends React.Component {
   render() {

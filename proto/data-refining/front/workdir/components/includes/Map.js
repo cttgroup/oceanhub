@@ -1,12 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-// import Cement from './Cement'
 
 const isBrowser = typeof window !== 'undefined';
 const RL = isBrowser ? require('react-leaflet') : undefined
-// const L = isBrowser ? require('leaflet') : undefined
-// const RLC = isBrowser ? require('react-leaflet-control') : undefined
-// const handler = isBrowser ? require('leaflet-path-drag') : undefined
 
 
 
@@ -72,21 +68,6 @@ export class Map extends React.Component {
     </div>)
   }
 }
-      /*
-      <h3>{this.state.status}</h3>
-
-        <RL.Polygon
-          positions={this.props.defaultRegion}
-          color={'lightblue'}
-        />
-
-        // Using mapbox as tile layer
-        <RL.TileLayer
-          url={this.defaultTileLayerURL}
-          id={this.id}
-        />
-        */
-
 
 class Region extends React.Component {
   constructor(props) {

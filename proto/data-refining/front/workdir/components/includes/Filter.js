@@ -86,18 +86,6 @@ export class Filter extends React.Component {
 Filter.propTypes = {
   handleStateKeyValueUpdate: PropTypes.func,
 }
-      /*
-          <ZText
-            name='characteristics'
-            lable='Пометка'
-            help='Пометка облегчит поиск дампа файла'
-            _handleChange={this.handleChange}
-          />
-        <PointsNumber
-          value={this.state.filter.points}
-          _handleChange={this.handleChange}
-        />
-      */
 
 
 class SubmitButton extends React.Component {
@@ -117,15 +105,12 @@ class SubmitButton extends React.Component {
   handleClick(e) {
     if (this.state.status == 'ready') {
       this.props.handleSubmit(e)
-      // this.setState({ status: 'progress' })
     }
   }
 
   render() {
-    // console.log('status >', this.state.status);
     return (<div className={this.className}>
       <Button
-        // bsSize="small"
         block
         disabled={this.state.status=='ready'?false:true}
         onClick={this.handleClick}

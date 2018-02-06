@@ -37,7 +37,6 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # Plugging own applications
-    # 'world',
     'ocean',
     'parse',
     'dump',

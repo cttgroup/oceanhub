@@ -87,19 +87,3 @@ static bool testHit(const std::vector<VectorLayerShapeType> & shapes,
 }
 
 #endif // TESTHIT_H
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

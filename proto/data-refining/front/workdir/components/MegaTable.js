@@ -40,9 +40,6 @@ export class MegaTable extends Component {
         <tr key={key}>{
           Object.keys(legend).map((element, key) =>
           {
-          // console.log('legend', element);
-          // console.log('rowel',row.find(rowElement => rowElement == element))
-          // console.log('row', row[element]);
             return (<td key={key}>{row[element]}</td>)
           })
         }</tr>
@@ -90,13 +87,7 @@ export class ZMegaTable extends Component {
     this.handleModalSubmit = this.handleModalSubmit.bind(this)
   }
   componentWillReceiveProps(nextProps) {
-    // this.setState({body: nextProps.data.body})
   }
-  /*
-  componentWillUpdate(nextProps, nextState) {
-    // this.body = nextState.body
-  }
-  */
 
   handleModalSubmit(values, index) {
     let arrBody = this.state.arrBody
@@ -253,26 +244,3 @@ class TableRowEdit extends React.Component {
 
 
 export default MegaTable
-
-
-      /*
-       table: { colNumbers: -1, body: [], legend: {}, },
-        let table = {
-          body: data,
-          legend: {
-            id: 'ID',
-            timestamp: 'Время создания',
-            status: 'Статус',
-            file_name: 'Файл',
-            file_size: 'Размер',
-            elapsed_time: 'Время выполнения',
-          },
-          columns: [{
-              Header: 'ID',
-              accessor: 'id'
-            }, {
-              Header: 'Время создания',
-              accessor: 'timestamp',
-          }],
-        }
-        */

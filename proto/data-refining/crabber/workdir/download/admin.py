@@ -12,4 +12,3 @@ class TaskAdmin(admin.ModelAdmin):
 admin.site.register(Server)
 admin.site.register(StorePrefix)
 admin.site.register(Task, TaskAdmin)
-# admin.site.register(Task)
