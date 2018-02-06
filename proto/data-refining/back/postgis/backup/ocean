@@ -1,0 +1,2190 @@
+--
+-- PostgreSQL database cluster dump
+--
+
+SET default_transaction_read_only = off;
+
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+
+--
+-- Roles
+--
+
+CREATE ROLE ocean;
+ALTER ROLE ocean WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS VALID UNTIL 'infinity';
+CREATE ROLE postgres;
+ALTER ROLE postgres WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION BYPASSRLS;
+
+
+
+
+
+
+--
+-- Database creation
+--
+
+CREATE DATABASE ocean WITH TEMPLATE = template0 OWNER = ocean;
+ALTER DATABASE postgres SET search_path TO "$user", public, tiger;
+REVOKE ALL ON DATABASE template1 FROM PUBLIC;
+REVOKE ALL ON DATABASE template1 FROM postgres;
+GRANT ALL ON DATABASE template1 TO postgres;
+GRANT CONNECT ON DATABASE template1 TO PUBLIC;
+CREATE DATABASE template_postgis WITH TEMPLATE = template0 OWNER = postgres IS_TEMPLATE = true;
+ALTER DATABASE template_postgis SET search_path TO "$user", public, tiger;
+
+
+\connect ocean
+
+SET default_transaction_read_only = off;
+
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.5.5
+-- Dumped by pg_dump version 9.5.5
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: tiger; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA tiger;
+
+
+ALTER SCHEMA tiger OWNER TO postgres;
+
+--
+-- Name: tiger_data; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA tiger_data;
+
+
+ALTER SCHEMA tiger_data OWNER TO postgres;
+
+--
+-- Name: topology; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA topology;
+
+
+ALTER SCHEMA topology OWNER TO postgres;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
+
+
+--
+-- Name: postgis; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION postgis IS 'PostGIS geometry, geography, and raster spatial types and functions';
+
+
+--
+-- Name: postgis_tiger_geocoder; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder WITH SCHEMA tiger;
+
+
+--
+-- Name: EXTENSION postgis_tiger_geocoder; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION postgis_tiger_geocoder IS 'PostGIS tiger geocoder and reverse geocoder';
+
+
+--
+-- Name: postgis_topology; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
+
+
+--
+-- Name: EXTENSION postgis_topology; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION postgis_topology IS 'PostGIS topology spatial types and functions';
+
+
+SET search_path = public, pg_catalog;
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- Name: auth_group; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE auth_group (
+    id integer NOT NULL,
+    name character varying(80) NOT NULL
+);
+
+
+ALTER TABLE auth_group OWNER TO ocean;
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE auth_group_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE auth_group_id_seq OWNER TO ocean;
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE auth_group_id_seq OWNED BY auth_group.id;
+
+
+--
+-- Name: auth_group_permissions; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE auth_group_permissions (
+    id integer NOT NULL,
+    group_id integer NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE auth_group_permissions OWNER TO ocean;
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE auth_group_permissions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE auth_group_permissions_id_seq OWNER TO ocean;
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE auth_group_permissions_id_seq OWNED BY auth_group_permissions.id;
+
+
+--
+-- Name: auth_permission; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE auth_permission (
+    id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    content_type_id integer NOT NULL,
+    codename character varying(100) NOT NULL
+);
+
+
+ALTER TABLE auth_permission OWNER TO ocean;
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE auth_permission_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE auth_permission_id_seq OWNER TO ocean;
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE auth_permission_id_seq OWNED BY auth_permission.id;
+
+
+--
+-- Name: auth_user; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE auth_user (
+    id integer NOT NULL,
+    password character varying(128) NOT NULL,
+    last_login timestamp with time zone,
+    is_superuser boolean NOT NULL,
+    username character varying(150) NOT NULL,
+    first_name character varying(30) NOT NULL,
+    last_name character varying(30) NOT NULL,
+    email character varying(254) NOT NULL,
+    is_staff boolean NOT NULL,
+    is_active boolean NOT NULL,
+    date_joined timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE auth_user OWNER TO ocean;
+
+--
+-- Name: auth_user_groups; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE auth_user_groups (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    group_id integer NOT NULL
+);
+
+
+ALTER TABLE auth_user_groups OWNER TO ocean;
+
+--
+-- Name: auth_user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE auth_user_groups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE auth_user_groups_id_seq OWNER TO ocean;
+
+--
+-- Name: auth_user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE auth_user_groups_id_seq OWNED BY auth_user_groups.id;
+
+
+--
+-- Name: auth_user_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE auth_user_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE auth_user_id_seq OWNER TO ocean;
+
+--
+-- Name: auth_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE auth_user_id_seq OWNED BY auth_user.id;
+
+
+--
+-- Name: auth_user_user_permissions; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE auth_user_user_permissions (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    permission_id integer NOT NULL
+);
+
+
+ALTER TABLE auth_user_user_permissions OWNER TO ocean;
+
+--
+-- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE auth_user_user_permissions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE auth_user_user_permissions_id_seq OWNER TO ocean;
+
+--
+-- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE auth_user_user_permissions_id_seq OWNED BY auth_user_user_permissions.id;
+
+
+--
+-- Name: django_admin_log; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE django_admin_log (
+    id integer NOT NULL,
+    action_time timestamp with time zone NOT NULL,
+    object_id text,
+    object_repr character varying(200) NOT NULL,
+    action_flag smallint NOT NULL,
+    change_message text NOT NULL,
+    content_type_id integer,
+    user_id integer NOT NULL,
+    CONSTRAINT django_admin_log_action_flag_check CHECK ((action_flag >= 0))
+);
+
+
+ALTER TABLE django_admin_log OWNER TO ocean;
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE django_admin_log_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE django_admin_log_id_seq OWNER TO ocean;
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE django_admin_log_id_seq OWNED BY django_admin_log.id;
+
+
+--
+-- Name: django_content_type; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE django_content_type (
+    id integer NOT NULL,
+    app_label character varying(100) NOT NULL,
+    model character varying(100) NOT NULL
+);
+
+
+ALTER TABLE django_content_type OWNER TO ocean;
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE django_content_type_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE django_content_type_id_seq OWNER TO ocean;
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE django_content_type_id_seq OWNED BY django_content_type.id;
+
+
+--
+-- Name: django_migrations; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE django_migrations (
+    id integer NOT NULL,
+    app character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    applied timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE django_migrations OWNER TO ocean;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE django_migrations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE django_migrations_id_seq OWNER TO ocean;
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE django_migrations_id_seq OWNED BY django_migrations.id;
+
+
+--
+-- Name: django_session; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE django_session (
+    session_key character varying(40) NOT NULL,
+    session_data text NOT NULL,
+    expire_date timestamp with time zone NOT NULL
+);
+
+
+ALTER TABLE django_session OWNER TO ocean;
+
+--
+-- Name: world_region; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE world_region (
+    id integer NOT NULL,
+    title character varying(50) NOT NULL,
+    slug character varying(50) NOT NULL,
+    poly geometry(Polygon,4326) NOT NULL
+);
+
+
+ALTER TABLE world_region OWNER TO ocean;
+
+--
+-- Name: world_region_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE world_region_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE world_region_id_seq OWNER TO ocean;
+
+--
+-- Name: world_region_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE world_region_id_seq OWNED BY world_region.id;
+
+
+--
+-- Name: world_sstday; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE world_sstday (
+    id integer NOT NULL,
+    datetime timestamp with time zone NOT NULL,
+    point geometry(Point,4326) NOT NULL,
+    degree_c double precision
+);
+
+
+ALTER TABLE world_sstday OWNER TO ocean;
+
+--
+-- Name: world_sstday_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE world_sstday_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE world_sstday_id_seq OWNER TO ocean;
+
+--
+-- Name: world_sstday_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE world_sstday_id_seq OWNED BY world_sstday.id;
+
+
+--
+-- Name: world_worldborder; Type: TABLE; Schema: public; Owner: ocean
+--
+
+CREATE TABLE world_worldborder (
+    id integer NOT NULL,
+    name character varying(50) NOT NULL,
+    area integer NOT NULL,
+    pop2005 integer NOT NULL,
+    fips character varying(2) NOT NULL,
+    iso2 character varying(2) NOT NULL,
+    iso3 character varying(3) NOT NULL,
+    un integer NOT NULL,
+    region integer NOT NULL,
+    subregion integer NOT NULL,
+    lon double precision NOT NULL,
+    lat double precision NOT NULL,
+    mpoly geometry(MultiPolygon,4326) NOT NULL
+);
+
+
+ALTER TABLE world_worldborder OWNER TO ocean;
+
+--
+-- Name: world_worldborder_id_seq; Type: SEQUENCE; Schema: public; Owner: ocean
+--
+
+CREATE SEQUENCE world_worldborder_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE world_worldborder_id_seq OWNER TO ocean;
+
+--
+-- Name: world_worldborder_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ocean
+--
+
+ALTER SEQUENCE world_worldborder_id_seq OWNED BY world_worldborder.id;
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_group ALTER COLUMN id SET DEFAULT nextval('auth_group_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_group_permissions ALTER COLUMN id SET DEFAULT nextval('auth_group_permissions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_permission ALTER COLUMN id SET DEFAULT nextval('auth_permission_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user ALTER COLUMN id SET DEFAULT nextval('auth_user_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user_groups ALTER COLUMN id SET DEFAULT nextval('auth_user_groups_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user_user_permissions ALTER COLUMN id SET DEFAULT nextval('auth_user_user_permissions_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY django_admin_log ALTER COLUMN id SET DEFAULT nextval('django_admin_log_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY django_content_type ALTER COLUMN id SET DEFAULT nextval('django_content_type_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY django_migrations ALTER COLUMN id SET DEFAULT nextval('django_migrations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY world_region ALTER COLUMN id SET DEFAULT nextval('world_region_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY world_sstday ALTER COLUMN id SET DEFAULT nextval('world_sstday_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY world_worldborder ALTER COLUMN id SET DEFAULT nextval('world_worldborder_id_seq'::regclass);
+
+
+--
+-- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY auth_group (id, name) FROM stdin;
+\.
+
+
+--
+-- Name: auth_group_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('auth_group_id_seq', 1, false);
+
+
+--
+-- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY auth_group_permissions (id, group_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Name: auth_group_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('auth_group_permissions_id_seq', 1, false);
+
+
+--
+-- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
+1	Can add log entry	1	add_logentry
+2	Can change log entry	1	change_logentry
+3	Can delete log entry	1	delete_logentry
+4	Can add group	2	add_group
+5	Can change group	2	change_group
+6	Can delete group	2	delete_group
+7	Can add user	3	add_user
+8	Can change user	3	change_user
+9	Can delete user	3	delete_user
+10	Can add permission	4	add_permission
+11	Can change permission	4	change_permission
+12	Can delete permission	4	delete_permission
+13	Can add content type	5	add_contenttype
+14	Can change content type	5	change_contenttype
+15	Can delete content type	5	delete_contenttype
+16	Can add session	6	add_session
+17	Can change session	6	change_session
+18	Can delete session	6	delete_session
+19	Can add cors model	7	add_corsmodel
+20	Can change cors model	7	change_corsmodel
+21	Can delete cors model	7	delete_corsmodel
+28	Can add region	10	add_region
+29	Can change region	10	change_region
+30	Can delete region	10	delete_region
+31	Can add world border	11	add_worldborder
+32	Can change world border	11	change_worldborder
+33	Can delete world border	11	delete_worldborder
+34	Can add sst day	12	add_sstday
+35	Can change sst day	12	change_sstday
+36	Can delete sst day	12	delete_sstday
+\.
+
+
+--
+-- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('auth_permission_id_seq', 36, true);
+
+
+--
+-- Data for Name: auth_user; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
+1	pbkdf2_sha256$30000$otoAAkSeLnm2$TEGBBWLOWhNj9lKUNsi1ZSJa3tPPycU2HVGFImlf4iA=	2016-12-08 10:30:30.511081+00	t	droot				t	t	2016-11-11 11:15:25.435066+00
+\.
+
+
+--
+-- Data for Name: auth_user_groups; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY auth_user_groups (id, user_id, group_id) FROM stdin;
+\.
+
+
+--
+-- Name: auth_user_groups_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
+
+
+--
+-- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('auth_user_id_seq', 1, true);
+
+
+--
+-- Data for Name: auth_user_user_permissions; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
+\.
+
+
+--
+-- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('auth_user_user_permissions_id_seq', 1, false);
+
+
+--
+-- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
+2	2016-11-14 14:12:24.37048+00	1	Region object	1	[{"added": {}}]	10	1
+3	2016-11-14 14:14:34.046723+00	1	Region object	2	[{"changed": {"fields": ["slug"]}}]	10	1
+10	2016-11-14 15:23:18.137267+00	1	Region object	2	[{"changed": {"fields": ["mpoly", "poly"]}}]	10	1
+11	2016-11-14 15:37:24.766514+00	2	Region object	1	[{"added": {}}]	10	1
+15	2016-11-14 18:01:39.87049+00	1	Норвержское море	2	[{"changed": {"fields": ["mpoly"]}}]	10	1
+16	2016-11-14 18:06:03.071213+00	2	Баренцево море	2	[{"changed": {"fields": ["mpoly"]}}]	10	1
+17	2016-11-14 18:06:35.942619+00	2	Баренцево море	2	[{"changed": {"fields": ["mpoly"]}}]	10	1
+1	2016-11-11 13:04:58.643025+00	1	SeaSurfaceTemperature object	1	[{"added": {}}]	\N	1
+4	2016-11-14 14:15:27.022217+00	2	SeaSurfaceTemperature object	1	[{"added": {}}]	\N	1
+5	2016-11-14 14:16:30.078135+00	3	SeaSurfaceTemperature object	1	[{"added": {}}]	\N	1
+6	2016-11-14 14:16:50.891389+00	4	SeaSurfaceTemperature object	1	[{"added": {}}]	\N	1
+7	2016-11-14 14:17:10.125106+00	5	SeaSurfaceTemperature object	1	[{"added": {}}]	\N	1
+8	2016-11-14 14:17:27.750958+00	6	SeaSurfaceTemperature object	1	[{"added": {}}]	\N	1
+9	2016-11-14 14:38:04.81026+00	7	SeaSurfaceTemperature object	1	[{"added": {}}]	\N	1
+12	2016-11-14 15:39:15.637352+00	8	SeaSurfaceTemperature object	1	[{"added": {}}]	\N	1
+13	2016-11-14 15:39:42.976705+00	9	SeaSurfaceTemperature object	1	[{"added": {}}]	\N	1
+14	2016-11-14 15:41:06.370869+00	9	SeaSurfaceTemperature object	2	[{"changed": {"fields": ["point"]}}]	\N	1
+18	2016-11-28 10:55:51.391971+00	3121	SSTDay object	3		12	1
+19	2016-11-28 10:55:52.099601+00	3120	SSTDay object	3		12	1
+20	2016-11-28 10:55:52.121465+00	3119	SSTDay object	3		12	1
+21	2016-11-28 10:55:52.132356+00	3118	SSTDay object	3		12	1
+22	2016-11-28 10:55:52.143481+00	3117	SSTDay object	3		12	1
+23	2016-11-28 10:55:52.154665+00	3116	SSTDay object	3		12	1
+24	2016-11-28 10:55:52.165703+00	3115	SSTDay object	3		12	1
+25	2016-11-28 10:55:52.176834+00	3114	SSTDay object	3		12	1
+26	2016-11-28 10:55:52.187985+00	3113	SSTDay object	3		12	1
+27	2016-11-28 10:55:52.198957+00	3112	SSTDay object	3		12	1
+28	2016-11-28 10:55:52.210088+00	3111	SSTDay object	3		12	1
+29	2016-11-28 10:55:52.221297+00	3110	SSTDay object	3		12	1
+30	2016-11-28 10:55:52.232272+00	3109	SSTDay object	3		12	1
+31	2016-11-28 10:55:52.243435+00	3108	SSTDay object	3		12	1
+32	2016-11-28 10:55:52.254655+00	3107	SSTDay object	3		12	1
+33	2016-11-28 10:55:52.265665+00	3106	SSTDay object	3		12	1
+34	2016-11-28 10:55:52.276823+00	3105	SSTDay object	3		12	1
+35	2016-11-28 10:55:52.28794+00	3104	SSTDay object	3		12	1
+36	2016-11-28 10:55:52.298977+00	3103	SSTDay object	3		12	1
+37	2016-11-28 10:55:52.310064+00	3102	SSTDay object	3		12	1
+38	2016-11-28 10:55:52.321291+00	3101	SSTDay object	3		12	1
+39	2016-11-28 10:55:52.33245+00	3100	SSTDay object	3		12	1
+40	2016-11-28 10:55:52.343483+00	3099	SSTDay object	3		12	1
+41	2016-11-28 10:55:52.354649+00	3098	SSTDay object	3		12	1
+42	2016-11-28 10:55:52.365751+00	3097	SSTDay object	3		12	1
+43	2016-11-28 10:55:52.376752+00	3096	SSTDay object	3		12	1
+44	2016-11-28 10:55:52.387958+00	3095	SSTDay object	3		12	1
+45	2016-11-28 10:55:52.39907+00	3094	SSTDay object	3		12	1
+46	2016-11-28 10:55:52.410037+00	3093	SSTDay object	3		12	1
+47	2016-11-28 10:55:52.421308+00	3092	SSTDay object	3		12	1
+48	2016-11-28 10:55:52.432394+00	3091	SSTDay object	3		12	1
+49	2016-11-28 10:55:52.443331+00	3090	SSTDay object	3		12	1
+50	2016-11-28 10:55:52.454659+00	3089	SSTDay object	3		12	1
+51	2016-11-28 10:55:52.465698+00	3088	SSTDay object	3		12	1
+52	2016-11-28 10:55:52.476655+00	3087	SSTDay object	3		12	1
+53	2016-11-28 10:55:52.487959+00	3086	SSTDay object	3		12	1
+54	2016-11-28 10:55:52.499058+00	3085	SSTDay object	3		12	1
+55	2016-11-28 10:55:52.50997+00	3084	SSTDay object	3		12	1
+56	2016-11-28 10:55:52.521331+00	3083	SSTDay object	3		12	1
+57	2016-11-28 10:55:52.532455+00	3082	SSTDay object	3		12	1
+58	2016-11-28 10:55:52.543353+00	3081	SSTDay object	3		12	1
+59	2016-11-28 10:55:52.554694+00	3080	SSTDay object	3		12	1
+60	2016-11-28 10:55:52.565783+00	3079	SSTDay object	3		12	1
+61	2016-11-28 10:55:52.576913+00	3078	SSTDay object	3		12	1
+62	2016-11-28 10:55:52.588049+00	3077	SSTDay object	3		12	1
+63	2016-11-28 10:55:52.599125+00	3076	SSTDay object	3		12	1
+64	2016-11-28 10:55:52.610156+00	3075	SSTDay object	3		12	1
+65	2016-11-28 10:55:52.621416+00	3074	SSTDay object	3		12	1
+66	2016-11-28 10:55:52.632456+00	3073	SSTDay object	3		12	1
+67	2016-11-28 10:55:52.643504+00	3072	SSTDay object	3		12	1
+68	2016-11-28 10:55:52.654714+00	3071	SSTDay object	3		12	1
+69	2016-11-28 10:55:52.665771+00	3070	SSTDay object	3		12	1
+70	2016-11-28 10:55:52.676832+00	3069	SSTDay object	3		12	1
+71	2016-11-28 10:55:52.688046+00	3068	SSTDay object	3		12	1
+72	2016-11-28 10:55:52.699121+00	3067	SSTDay object	3		12	1
+73	2016-11-28 10:55:52.71009+00	3066	SSTDay object	3		12	1
+74	2016-11-28 10:55:52.721374+00	3065	SSTDay object	3		12	1
+75	2016-11-28 10:55:52.732453+00	3064	SSTDay object	3		12	1
+76	2016-11-28 10:55:52.743528+00	3063	SSTDay object	3		12	1
+77	2016-11-28 10:55:52.754779+00	3062	SSTDay object	3		12	1
+78	2016-11-28 10:55:52.765858+00	3061	SSTDay object	3		12	1
+79	2016-11-28 10:55:52.776699+00	3060	SSTDay object	3		12	1
+80	2016-11-28 10:55:52.788214+00	3059	SSTDay object	3		12	1
+81	2016-11-28 10:55:52.799126+00	3058	SSTDay object	3		12	1
+82	2016-11-28 10:55:52.810231+00	3057	SSTDay object	3		12	1
+83	2016-11-28 10:55:52.821416+00	3056	SSTDay object	3		12	1
+84	2016-11-28 10:55:52.832417+00	3055	SSTDay object	3		12	1
+85	2016-11-28 10:55:52.843629+00	3054	SSTDay object	3		12	1
+86	2016-11-28 10:55:52.854746+00	3053	SSTDay object	3		12	1
+87	2016-11-28 10:55:52.865753+00	3052	SSTDay object	3		12	1
+88	2016-11-28 10:55:52.954813+00	3051	SSTDay object	3		12	1
+89	2016-11-28 10:55:52.965705+00	3050	SSTDay object	3		12	1
+90	2016-11-28 10:55:52.976901+00	3049	SSTDay object	3		12	1
+91	2016-11-28 10:55:52.987998+00	3048	SSTDay object	3		12	1
+92	2016-11-28 10:55:52.999028+00	3047	SSTDay object	3		12	1
+93	2016-11-28 10:55:53.010331+00	3046	SSTDay object	3		12	1
+94	2016-11-28 10:55:53.021362+00	3045	SSTDay object	3		12	1
+95	2016-11-28 10:55:53.032532+00	3044	SSTDay object	3		12	1
+96	2016-11-28 10:55:53.043608+00	3043	SSTDay object	3		12	1
+97	2016-11-28 10:55:53.054628+00	3042	SSTDay object	3		12	1
+98	2016-11-28 10:55:53.065713+00	3041	SSTDay object	3		12	1
+99	2016-11-28 10:55:53.076947+00	3040	SSTDay object	3		12	1
+100	2016-11-28 10:55:53.088+00	3039	SSTDay object	3		12	1
+101	2016-11-28 10:55:53.09919+00	3038	SSTDay object	3		12	1
+102	2016-11-28 10:55:53.11017+00	3037	SSTDay object	3		12	1
+103	2016-11-28 10:55:53.121326+00	3036	SSTDay object	3		12	1
+104	2016-11-28 10:55:53.13256+00	3035	SSTDay object	3		12	1
+105	2016-11-28 10:55:53.143567+00	3034	SSTDay object	3		12	1
+106	2016-11-28 10:55:53.154641+00	3033	SSTDay object	3		12	1
+107	2016-11-28 10:55:53.165809+00	3032	SSTDay object	3		12	1
+108	2016-11-28 10:55:53.17688+00	3031	SSTDay object	3		12	1
+109	2016-11-28 10:55:53.18809+00	3030	SSTDay object	3		12	1
+110	2016-11-28 10:55:53.199113+00	3029	SSTDay object	3		12	1
+111	2016-11-28 10:55:53.210209+00	3028	SSTDay object	3		12	1
+112	2016-11-28 10:55:53.221529+00	3027	SSTDay object	3		12	1
+113	2016-11-28 10:55:53.232507+00	3026	SSTDay object	3		12	1
+114	2016-11-28 10:55:53.243729+00	3025	SSTDay object	3		12	1
+115	2016-11-28 10:55:53.254935+00	3024	SSTDay object	3		12	1
+116	2016-11-28 10:55:53.266016+00	3023	SSTDay object	3		12	1
+117	2016-11-28 10:55:53.277166+00	3022	SSTDay object	3		12	1
+118	2016-11-28 11:29:55.531648+00	5	Norv Sea trapezoid	1	[{"added": {}}]	10	1
+119	2016-11-28 11:30:18.951995+00	5	Norv Sea trapezoid	2	[]	10	1
+120	2016-11-28 11:38:37.682642+00	1	Норвержское море	3		10	1
+121	2016-11-28 11:39:03.92185+00	6	Норвержское море	1	[{"added": {}}]	10	1
+122	2016-11-28 11:39:18.204224+00	6	Норвержское море	2	[]	10	1
+123	2016-11-28 11:39:24.589889+00	6	Норвержское море	2	[]	10	1
+\.
+
+
+--
+-- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('django_admin_log_id_seq', 123, true);
+
+
+--
+-- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY django_content_type (id, app_label, model) FROM stdin;
+1	admin	logentry
+2	auth	group
+3	auth	user
+4	auth	permission
+5	contenttypes	contenttype
+6	sessions	session
+7	corsheaders	corsmodel
+10	world	region
+11	world	worldborder
+12	world	sstday
+\.
+
+
+--
+-- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('django_content_type_id_seq', 12, true);
+
+
+--
+-- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY django_migrations (id, app, name, applied) FROM stdin;
+1	contenttypes	0001_initial	2016-11-11 11:15:06.743325+00
+2	auth	0001_initial	2016-11-11 11:15:08.00116+00
+3	admin	0001_initial	2016-11-11 11:15:08.267734+00
+4	admin	0002_logentry_remove_auto_add	2016-11-11 11:15:08.300783+00
+5	contenttypes	0002_remove_content_type_name	2016-11-11 11:15:08.36752+00
+6	auth	0002_alter_permission_name_max_length	2016-11-11 11:15:08.400825+00
+7	auth	0003_alter_user_email_max_length	2016-11-11 11:15:08.434137+00
+8	auth	0004_alter_user_username_opts	2016-11-11 11:15:08.462639+00
+9	auth	0005_alter_user_last_login_null	2016-11-11 11:15:08.501052+00
+10	auth	0006_require_contenttypes_0002	2016-11-11 11:15:08.511986+00
+11	auth	0007_alter_validators_add_error_messages	2016-11-11 11:15:08.53982+00
+12	auth	0008_alter_user_username_max_length	2016-11-11 11:15:08.634347+00
+13	sessions	0001_initial	2016-11-11 11:15:08.912546+00
+14	world	0001_initial	2016-11-11 12:43:17.5349+00
+15	world	0002_seasurfacetemperature_point	2016-11-11 12:55:45.163909+00
+16	world	0003_auto_20161111_1243	2016-11-11 12:55:45.184316+00
+17	world	0004_auto_20161111_1252	2016-11-11 12:55:45.195293+00
+18	world	0005_remove_seasurfacetemperature_point	2016-11-11 12:55:45.206346+00
+19	world	0006_delete_worldborder	2016-11-11 12:55:45.217281+00
+20	world	0007_delete_seasurfacetemperature	2016-11-11 12:55:45.228538+00
+21	world	0008_seasurfacetemperature	2016-11-11 12:56:08.768932+00
+22	world	0009_delete_seasurfacetemperature	2016-11-11 12:57:56.469931+00
+23	world	0010_seasurfacetemperature	2016-11-11 12:58:11.504221+00
+24	world	0011_seasurfacetemperature_point	2016-11-11 12:58:53.281666+00
+25	world	0012_region	2016-11-14 14:10:12.797757+00
+26	world	0013_region_slug	2016-11-14 14:14:16.60193+00
+27	world	0014_auto_20161114_1416	2016-11-14 14:16:09.463822+00
+28	world	0015_auto_20161114_1418	2016-11-14 14:18:28.269891+00
+29	world	0016_auto_20161114_1418	2016-11-14 14:18:54.791055+00
+30	world	0017_auto_20161114_1434	2016-11-14 14:37:30.692351+00
+31	world	0018_auto_20161114_1437	2016-11-14 14:37:30.714602+00
+35	world	0019_region_poly	2016-11-14 15:16:27.652316+00
+36	world	0020_auto_20161114_1502	2016-11-14 15:16:27.66922+00
+37	world	0021_remove_region_poly	2016-11-14 15:16:27.680738+00
+38	world	0022_region_poly	2016-11-14 15:17:36.571634+00
+40	world	0023_remove_region_poly	2016-11-14 15:21:48.167498+00
+41	world	0024_region_poly	2016-11-14 15:22:10.870267+00
+42	world	0025_auto_20161114_1542	2016-11-14 15:42:17.657142+00
+43	world	0026_auto_20161125_0727	2016-11-25 07:28:47.919831+00
+44	world	0027_delete_worldborder	2016-11-25 07:28:48.151181+00
+45	world	0028_worldborder	2016-11-25 07:29:31.530589+00
+46	world	0029_sstday	2016-11-25 07:34:48.085082+00
+47	world	0030_auto_20161128_1128	2016-11-28 11:28:35.257571+00
+48	world	0031_region_mpoly	2016-11-28 11:29:25.563259+00
+49	world	0032_remove_region_mpoly	2016-11-28 11:30:13.611391+00
+50	world	0033_auto_20161128_1324	2016-11-28 13:24:16.880368+00
+51	world	0034_auto_20161128_1325	2016-11-28 13:25:06.28016+00
+\.
+
+
+--
+-- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('django_migrations_id_seq', 51, true);
+
+
+--
+-- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY django_session (session_key, session_data, expire_date) FROM stdin;
+xk9uvq1ekq4x26k9zllyaeezav4w7edl	NWE0ZDkyY2Y0ZTNmY2UwZmM4NDQxOTAyNmI5YTVhMDFkMjZmZmYwMDp7Il9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiNGU4OGJiZDkzYjNlYTE0ODE3NzJlNDE0YzA4YThhMDUxZGExZTE2OSIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-11-25 13:00:38.300075+00
+5wdavxponlbl4uv6d8zceuuygxr71aw2	MDY5MDllYTRlOTk5N2I0YjM5MGE5N2QyM2FlNzllOTkyNDA1YjMyMDp7Il9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9pZCI6IjEiLCJfYXV0aF91c2VyX2hhc2giOiI0ZTg4YmJkOTNiM2VhMTQ4MTc3MmU0MTRjMDhhOGEwNTFkYTFlMTY5In0=	2016-12-06 15:00:10.621635+00
+iewafbdhotqyzufzrzaccva0oqg1yha8	MTg0YmIwYWM0ZmE5NWIyNDBkOWY5YzhmNWZhMjliYzNjMWFiZmU4Nzp7Il9hdXRoX3VzZXJfaGFzaCI6IjRlODhiYmQ5M2IzZWExNDgxNzcyZTQxNGMwOGE4YTA1MWRhMWUxNjkiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-12-09 07:17:40.941776+00
+wola5fygzq3dwsk2kq45b1fn8ph3xzqx	MTg0YmIwYWM0ZmE5NWIyNDBkOWY5YzhmNWZhMjliYzNjMWFiZmU4Nzp7Il9hdXRoX3VzZXJfaGFzaCI6IjRlODhiYmQ5M2IzZWExNDgxNzcyZTQxNGMwOGE4YTA1MWRhMWUxNjkiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-12-13 15:44:05.265377+00
+s0edxkqazzbo7tl2ht72u4r9bfvt36ja	MTg0YmIwYWM0ZmE5NWIyNDBkOWY5YzhmNWZhMjliYzNjMWFiZmU4Nzp7Il9hdXRoX3VzZXJfaGFzaCI6IjRlODhiYmQ5M2IzZWExNDgxNzcyZTQxNGMwOGE4YTA1MWRhMWUxNjkiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-12-13 17:31:31.774968+00
+ufodbnogunfcwlqnlctv8cu6v8nhf8cx	NWE0ZDkyY2Y0ZTNmY2UwZmM4NDQxOTAyNmI5YTVhMDFkMjZmZmYwMDp7Il9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiNGU4OGJiZDkzYjNlYTE0ODE3NzJlNDE0YzA4YThhMDUxZGExZTE2OSIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-12-22 10:30:30.632719+00
+\.
+
+
+--
+-- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY spatial_ref_sys  FROM stdin;
+\.
+
+
+--
+-- Data for Name: world_region; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY world_region (id, title, slug, poly) FROM stdin;
+2	Баренцево море	barenc-sea	0103000020E61000000100000009000000000000000033334000000000801D52400000000000573C400000000000C9534000000000A0213B4000000000983D56400000000050DF4140000000003843564000000000D0D3454000000000983D564000000000504446400000000068CA53400000000080BF4F400000000000C953400000000080F546400000000080C35140000000000033334000000000801D5240
+5	Norv Sea trapezoid	norv-trapezoid	0103000020E61000000100000005000000BF654E97C57C2FC0D76CE525FF71534068B0A9F3A8F43B40D76CE525FF71534068B0A9F3A8F43B40B7D4415E0FBA4D40BF654E97C57C2FC0B7D4415E0FBA4D40BF654E97C57C2FC0D76CE525FF715340
+6	Норвержское море	norv-sea	0103000020E61000000100000005000000DD9A745B22971740B7D4415E0FBA4D40BF654E97C57C2FC033A7CB62621A50400CCA349A5C3C2F40D76CE525FF71534068B0A9F3A8F43B40D1950854FFA05140DD9A745B22971740B7D4415E0FBA4D40
+\.
+
+
+--
+-- Name: world_region_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('world_region_id_seq', 6, true);
+
+
+--
+-- Data for Name: world_sstday; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY world_sstday (id, datetime, point, degree_c) FROM stdin;
+1042379	2016-12-06 10:26:41.711206+00	0101000020E6100000742497FF909E2AC032E6AE25E4EB5240	-4.34499999999999975
+1042380	2016-12-06 10:26:41.726055+00	0101000020E610000018265305A3922AC0363CBD5296E95240	-4.72499999999999964
+1042381	2016-12-06 10:26:41.7249+00	0101000020E61000007F6ABC7493982AC03411363CBDEA5240	-4.45000000000000018
+1042382	2016-12-06 10:26:41.735365+00	0101000020E6100000B1E1E995B28C2AC08638D6C56DE85240	-4.61000000000000032
+1042383	2016-12-06 10:26:41.821352+00	0101000020E61000006688635DDC862AC088635DDC46E75240	-4.73000000000000043
+1042384	2016-12-06 10:26:41.874428+00	0101000020E61000001B2FDD2406812AC08A8EE4F21FE65240	-4.65000000000000036
+1042385	2016-12-06 10:26:41.920308+00	0101000020E61000005E4BC8073D7B2AC0DB8AFD65F7E45240	-5.02500000000000036
+1042386	2016-12-06 10:26:41.932246+00	0101000020E6100000A167B3EA73752AC0DDB5847CD0E35240	-5.45999999999999996
+1042387	2016-12-06 10:26:41.97525+00	0101000020E610000060764F1E166A2AC02FDD240681E15240	-5.23000000000000043
+1042388	2016-12-06 10:26:41.939043+00	0101000020E6100000006F8104C56F2AC02DB29DEFA7E25240	-5.35500000000000043
+1042389	2016-12-06 10:26:42.059501+00	0101000020E61000006ABC749318442AC03F355EBA49EC5240	-4.37000000000000011
+1042390	2016-12-06 10:26:42.084841+00	0101000020E610000091ED7C3F353E2AC0F38E537424EB5240	-4.32500000000000018
+1042391	2016-12-06 10:26:42.11601+00	0101000020E6100000D50968226C382AC0F5B9DA8AFDE95240	-4.45500000000000007
+1042392	2016-12-06 10:26:42.148152+00	0101000020E610000018265305A3322AC0F7E461A1D6E85240	-4.45999999999999996
+1042393	2016-12-06 10:26:42.242764+00	0101000020E61000001A51DA1B7C212AC0FE65F7E461E55240	-4.68499999999999961
+1042394	2016-12-06 10:26:42.188702+00	0101000020E61000005B423EE8D92C2AC0F90FE9B7AFE75240	-4.57500000000000018
+1042395	2016-12-06 10:26:42.301048+00	0101000020E610000096438B6CE71B2AC000917EFB3AE45240	-4.94500000000000028
+1042396	2016-12-06 10:26:42.203446+00	0101000020E6100000BA490C022B272AC0FB3A70CE88E65240	-4.53500000000000014
+1042397	2016-12-06 10:26:42.36672+00	0101000020E610000011363CBD52162AC002BC051214E35240	-5.19500000000000028
+1042398	2016-12-06 10:26:42.409232+00	0101000020E61000008D28ED0DBE102AC004E78C28EDE15240	-5.12000000000000011
+1042399	2016-12-06 10:26:42.425222+00	0101000020E61000000AD7A3703DEA29C09B559FABADEC5240	-4.16999999999999993
+1042400	2016-12-06 10:26:42.438792+00	0101000020E6100000DC68006F81E429C09D8026C286EB5240	-4.32000000000000028
+1042401	2016-12-06 10:26:42.491728+00	0101000020E61000003B70CE88D2DE29C051DA1B7C61EA5240	-4.35500000000000043
+1042402	2016-12-06 10:26:42.543893+00	0101000020E61000009A779CA223D929C0053411363CE95240	-4.45000000000000018
+1042403	2016-12-06 10:26:42.603597+00	0101000020E6100000925CFE43FACD29C0BBB88D06F0E65240	-4.83499999999999996
+1042404	2016-12-06 10:26:42.616489+00	0101000020E61000009CC420B072C829C0BDE3141DC9E55240	-4.58499999999999996
+1042405	2016-12-06 10:26:42.557848+00	0101000020E6100000166A4DF38ED329C0075F984C15E85240	-4.58499999999999996
+1042406	2016-12-06 10:26:42.696029+00	0101000020E6100000A52C431CEBC229C0713D0AD7A3E45240	-4.59499999999999975
+1042407	2016-12-06 10:26:42.744923+00	0101000020E6100000E2E995B20C9129C0E2E995B20CED5240	-4.08999999999999986
+1042408	2016-12-06 10:26:42.702953+00	0101000020E6100000CC7F48BF7DBD29C0736891ED7CE35240	-4.80499999999999972
+1042409	2016-12-06 10:26:42.72767+00	0101000020E6100000F2D24D6210B829C027C286A757E25240	-4.66000000000000014
+1042410	2016-12-06 10:26:42.810175+00	0101000020E6100000CF66D5E76A8B29C096438B6CE7EB5240	-4.15000000000000036
+1042411	2016-12-06 10:26:42.904643+00	0101000020E610000055C1A8A44E8029C0AF25E4839EE95240	-4.44000000000000039
+1042412	2016-12-06 10:26:42.866466+00	0101000020E61000004B598638D68529C0FBCBEEC9C3EA5240	-4.28000000000000025
+1042413	2016-12-06 10:26:42.916637+00	0101000020E6100000ED9E3C2CD47A29C0637FD93D79E85240	-5.34999999999999964
+1042414	2016-12-06 10:26:42.997717+00	0101000020E610000013F241CF667529C017D9CEF753E75240	-5.24000000000000021
+1042415	2016-12-06 10:26:43.029668+00	0101000020E610000039454772F96F29C0CA32C4B12EE65240	-4.625
+1042416	2016-12-06 10:26:43.051287+00	0101000020E6100000ED0DBE30996A29C07E8CB96B09E55240	-4.56500000000000039
+1042417	2016-12-06 10:26:43.098997+00	0101000020E6100000304CA60A466529C032E6AE25E4E35240	-4.63999999999999968
+1042418	2016-12-06 10:26:43.12686+00	0101000020E6100000728A8EE4F25F29C0E63FA4DFBEE25240	-4.58000000000000007
+1042419	2016-12-06 10:26:43.193357+00	0101000020E6100000D50968226C3829C0764F1E166AED5240	-3.83999999999999986
+1042420	2016-12-06 10:26:43.255579+00	0101000020E6100000933A014D842D29C09031772D21EB5240	-4.33999999999999986
+1042421	2016-12-06 10:26:43.276522+00	0101000020E6100000B98D06F0162829C0F5B9DA8AFDE95240	-4.06500000000000039
+1042422	2016-12-06 10:26:43.24745+00	0101000020E61000006DE7FBA9F13229C0DCD7817346EC5240	-4.07500000000000018
+1042423	2016-12-06 10:26:43.309045+00	0101000020E6100000FBCBEEC9C32229C0A913D044D8E85240	-4.40000000000000036
+1042424	2016-12-06 10:26:43.408649+00	0101000020E61000003D0AD7A3701D29C00F9C33A2B4E75240	-4.31500000000000039
+1042425	2016-12-06 10:26:43.436842+00	0101000020E61000003D9B559FAB0D29C0DCD7817346E45240	-4.61500000000000021
+1042426	2016-12-06 10:26:43.420498+00	0101000020E61000008048BF7D1D1829C0C3F5285C8FE65240	-4.37999999999999989
+1042427	2016-12-06 10:26:43.43464+00	0101000020E6100000DE718A8EE41229C0287E8CB96BE55240	-4.25499999999999989
+1042428	2016-12-06 10:26:43.524418+00	0101000020E6100000FF21FDF675E028C0A857CA32C4ED5240	-4.41000000000000014
+1042429	2016-12-06 10:26:43.515054+00	0101000020E61000002A3A92CB7F0829C04260E5D022E35240	-4.48000000000000043
+1042430	2016-12-06 10:26:43.558946+00	0101000020E61000004260E5D022DB28C00DE02D90A0EC5240	-4.46999999999999975
+1042431	2016-12-06 10:26:43.617385+00	0101000020E6100000849ECDAACFD528C0736891ED7CEB5240	-4.59499999999999975
+1042432	2016-12-06 10:26:43.667358+00	0101000020E6100000C6DCB5847CD028C0D8F0F44A59EA5240	-4.34499999999999975
+1042433	2016-12-06 10:26:43.717805+00	0101000020E6100000832F4CA60AC628C0A301BC0512E85240	-4.25999999999999979
+1042434	2016-12-06 10:26:43.683786+00	0101000020E61000002506819543CB28C03E7958A835E95240	-4.29499999999999993
+1042435	2016-12-06 10:26:43.775115+00	0101000020E610000070CE88D2DEC028C0098A1F63EEE65240	-4.25499999999999989
+1042436	2016-12-06 10:26:43.839621+00	0101000020E6100000F46C567DAEB628C0D49AE61DA7E45240	-4.41500000000000004
+1042437	2016-12-06 10:26:43.82219+00	0101000020E6100000EBE2361AC0BB28C06F1283C0CAE55240	-4.16999999999999993
+1042438	2016-12-06 10:26:43.864834+00	0101000020E6100000FDF675E09CB128C03A234A7B83E35240	-4.32500000000000018
+1042439	2016-12-06 10:26:43.918574+00	0101000020E6100000D3BCE3141D8928C0273108AC1CEE5240	-5.08000000000000007
+1042440	2016-12-06 10:26:43.983603+00	0101000020E610000032E6AE25E48328C08CB96B09F9EC5240	-5.64499999999999957
+1042441	2016-12-06 10:26:44.066814+00	0101000020E6100000910F7A36AB7E28C0A4703D0AD7EB5240	-5.84999999999999964
+1042442	2016-12-06 10:26:44.080724+00	0101000020E61000007DAEB6627F7928C009F9A067B3EA5240	-5.73500000000000032
+1042443	2016-12-06 10:26:44.093593+00	0101000020E6100000014D840D4F6F28C08638D6C56DE85240	-4.83999999999999986
+1042444	2016-12-06 10:26:44.091994+00	0101000020E6100000F8C264AA607428C021B0726891E95240	-5.42499999999999982
+1042445	2016-12-06 10:26:44.226145+00	0101000020E61000000AD7A3703D6A28C09EEFA7C64BE75240	-4.94000000000000039
+1042446	2016-12-06 10:26:44.248644+00	0101000020E6100000A1D634EF386528C003780B2428E65240	-4.72499999999999964
+1042447	2016-12-06 10:26:44.249816+00	0101000020E6100000C74B3789416028C01B2FDD2406E55240	-4.77500000000000036
+1042448	2016-12-06 10:26:44.253382+00	0101000020E61000007A36AB3E575B28C080B74082E2E35240	-4.56500000000000039
+1042449	2016-12-06 10:26:44.376426+00	0101000020E6100000C364AA60543228C043AD69DE71EE5240	-7.06500000000000039
+1042450	2016-12-06 10:26:44.391106+00	0101000020E6100000DE02098A1F2328C089D2DEE00BEB5240	-7.45999999999999996
+1042451	2016-12-06 10:26:44.390488+00	0101000020E61000004703780B242828C0711B0DE02DEC5240	-8.375
+1042452	2016-12-06 10:26:44.389081+00	0101000020E6100000CCEEC9C3422D28C05A643BDF4FED5240	-8.51999999999999957
+1042453	2016-12-06 10:26:44.502453+00	0101000020E610000075029A081B1E28C0A089B0E1E9E95240	-6.74000000000000021
+1042454	2016-12-06 10:26:44.551134+00	0101000020E61000009A779CA2231928C0B84082E2C7E85240	-6.07500000000000018
+1042455	2016-12-06 10:26:44.578068+00	0101000020E61000004E621058391428C01DC9E53FA4E75240	-5.81500000000000039
+1042456	2016-12-06 10:26:44.583973+00	0101000020E6100000014D840D4F0F28C03480B74082E65240	-5.84999999999999964
+1042457	2016-12-06 10:26:44.607977+00	0101000020E610000043AD69DE710A28C04C37894160E55240	-6
+1042458	2016-12-06 10:26:44.695002+00	0101000020E61000001283C0CAA10528C063EE5A423EE45240	-5.90500000000000025
+1042459	2016-12-06 10:26:44.811542+00	0101000020E6100000EA04341136DC27C0FBCBEEC9C3EE5240	-7.58499999999999996
+1042460	2016-12-06 10:26:44.859244+00	0101000020E61000008104C58F31D727C0C4B12E6EA3ED5240	-8.13499999999999979
+1042461	2016-12-06 10:26:44.87047+00	0101000020E6100000A779C7293AD227C0DC68006F81EC5240	-8.08999999999999986
+1042462	2016-12-06 10:26:44.878544+00	0101000020E61000005A643BDF4FCD27C0F31FD26F5FEB5240	-7.83499999999999996
+1042463	2016-12-06 10:26:44.908981+00	0101000020E61000009CC420B072C827C0BC0512143FEA5240	-7.54999999999999982
+1042464	2016-12-06 10:26:44.967037+00	0101000020E6100000ADFA5C6DC5BE27C09CA223B9FCE75240	-7.38499999999999979
+1042465	2016-12-06 10:26:44.959462+00	0101000020E6100000DD24068195C327C0D3BCE3141DE95240	-7.26499999999999968
+1042466	2016-12-06 10:26:44.997019+00	0101000020E61000007DD0B359F5B927C0B459F5B9DAE65240	-7.37999999999999989
+1042467	2016-12-06 10:26:45.022295+00	0101000020E61000006891ED7C3FB527C0CB10C7BAB8E55240	-7.29499999999999993
+1042468	2016-12-06 10:26:45.061398+00	0101000020E6100000545227A089B027C094F6065F98E45240	-6.96999999999999975
+1042469	2016-12-06 10:26:45.100489+00	0101000020E6100000E09C11A5BD8127C0CBA145B6F3ED5240	-8.28999999999999915
+1042470	2016-12-06 10:26:45.076462+00	0101000020E61000009F3C2CD49A8627C002BC051214EF5240	-8.33000000000000007
+1042471	2016-12-06 10:26:45.133971+00	0101000020E610000022FDF675E07C27C09487855AD3EC5240	-8.17500000000000071
+1042472	2016-12-06 10:26:45.190164+00	0101000020E61000008048BF7D1D7827C05D6DC5FEB2EB5240	-8.23000000000000043
+1042473	2016-12-06 10:26:45.202941+00	0101000020E61000003BDF4F8D976E27C03D0AD7A370E95240	-7.86000000000000032
+1042474	2016-12-06 10:26:45.200523+00	0101000020E61000004F1E166A4D7327C0265305A392EA5240	-8.1850000000000005
+1042475	2016-12-06 10:26:45.212375+00	0101000020E610000027A089B0E16927C007F0164850E85240	-8.23499999999999943
+1042476	2016-12-06 10:26:45.278075+00	0101000020E6100000A1D634EF386527C0D0D556EC2FE75240	-7.95000000000000018
+1042477	2016-12-06 10:26:45.291653+00	0101000020E6100000B22E6EA3015C27C062A1D634EFE45240	-7.44500000000000028
+1042478	2016-12-06 10:26:45.285745+00	0101000020E6100000AA8251499D6027C099BB96900FE65240	-8.10999999999999943
+1042479	2016-12-06 10:26:45.375623+00	0101000020E610000027A089B0E1092F40D200DE0209AA4DC0	-9.20500000000000007
+1042480	2016-12-06 10:26:45.385632+00	0101000020E61000003C4ED1915CFE2E40AA60545227A84DC0	-8.95500000000000007
+1042481	2016-12-06 10:26:45.392056+00	0101000020E6100000DE718A8EE4F22E4083C0CAA145A64DC0	-8.69500000000000028
+1042482	2016-12-06 10:26:45.358894+00	0101000020E6100000857CD0B359152F405DFE43FAEDAB4DC0	-9.375
+1042483	2016-12-06 10:26:45.458662+00	0101000020E61000000F0BB5A679E72E40F8C264AA60A44DC0	-8.5600000000000005
+1042484	2016-12-06 10:26:45.483273+00	0101000020E610000040A4DFBE0EDC2E40D122DBF97EA24DC0	-8.17500000000000071
+1042485	2016-12-06 10:26:45.491144+00	0101000020E6100000713D0AD7A3D02E40462575029AA04DC0	-8.55499999999999972
+1042486	2016-12-06 10:26:45.503598+00	0101000020E6100000304CA60A46C52E40BB270F0BB59E4DC0	-8.36999999999999922
+1042487	2016-12-06 10:26:45.545998+00	0101000020E6100000EE5A423EE8B92E40302AA913D09C4DC0	-8.77999999999999936
+1042488	2016-12-06 10:26:45.567562+00	0101000020E6100000AD69DE718AAE2E40A52C431CEB9A4DC0	-9.04499999999999993
+1042489	2016-12-06 10:26:45.600015+00	0101000020E610000054742497FFF02E401D38674469AF4DC0	-10.0299999999999994
+1042490	2016-12-06 10:26:45.608163+00	0101000020E6100000F697DD9387E52E40F697DD9387AD4DC0	-10.2750000000000004
+1042491	2016-12-06 10:26:45.656908+00	0101000020E6100000273108AC1CDA2E40CFF753E3A5AB4DC0	-9.98000000000000043
+1042492	2016-12-06 10:26:45.665526+00	0101000020E610000058CA32C4B1CE2E40A857CA32C4A94DC0	-9.8100000000000005
+1042493	2016-12-06 10:26:45.735225+00	0101000020E61000004772F90FE9B72E40F5B9DA8AFDA54DC0	-9.35999999999999943
+1042494	2016-12-06 10:26:45.707561+00	0101000020E610000088635DDC46C32E4080B74082E2A74DC0	-9.75999999999999979
+1042495	2016-12-06 10:26:45.760154+00	0101000020E6100000C58F31772DA12E40431CEBE236A24DC0	-9.96000000000000085
+1042496	2016-12-06 10:26:45.753321+00	0101000020E6100000068195438BAC2E40CE1951DA1BA44DC0	-9.49000000000000021
+1042497	2016-12-06 10:26:45.833445+00	0101000020E6100000ED0DBE30998A2E40917EFB3A709E4DC0	-9.82499999999999929
+1042498	2016-12-06 10:26:45.841215+00	0101000020E6100000E9B7AF03E7CC2E40B459F5B9DAB24DC0	-11.8149999999999995
+1042499	2016-12-06 10:26:45.823947+00	0101000020E610000012143FC6DC952E401C7C613255A04DC0	-9.72499999999999964
+1042500	2016-12-06 10:26:45.875364+00	0101000020E61000001A51DA1B7CC12E408CB96B09F9B04DC0	-12.2449999999999992
+1042501	2016-12-06 10:26:45.933944+00	0101000020E61000004BEA043411B62E40C976BE9F1AAF4DC0	-12.6750000000000007
+1042502	2016-12-06 10:26:45.945936+00	0101000020E610000009F9A067B3AA2E40A1D634EF38AD4DC0	-13.7100000000000009
+1042503	2016-12-06 10:26:45.955948+00	0101000020E6100000C8073D9B559F2E407A36AB3E57AB4DC0	-13.7100000000000009
+1042504	2016-12-06 10:26:46.021527+00	0101000020E6100000D49AE61DA7882E402BF697DD93A74DC0	-12.4499999999999993
+1042505	2016-12-06 10:26:46.032687+00	0101000020E6100000AF946588637D2E4004560E2DB2A54DC0	-12.3949999999999996
+1042506	2016-12-06 10:26:45.992177+00	0101000020E61000008716D9CEF7932E405396218E75A94DC0	-12.7799999999999994
+1042507	2016-12-06 10:26:46.071595+00	0101000020E61000008A8EE4F21F722E40DDB5847CD0A34DC0	-12.6449999999999996
+1042508	2016-12-06 10:26:46.109518+00	0101000020E61000006688635DDC662E4052B81E85EBA14DC0	-12.8100000000000005
+1042509	2016-12-06 10:26:46.123422+00	0101000020E6100000B7D100DE02A92E4083C0CAA145B64DC0	-15.7149999999999999
+1042510	2016-12-06 10:26:46.143095+00	0101000020E6100000E86A2BF6979D2E40BF7D1D3867B44DC0	-13.6400000000000006
+1042511	2016-12-06 10:26:46.200863+00	0101000020E610000035EF384547922E4098DD938785B24DC0	-14.25
+1042512	2016-12-06 10:26:46.20736+00	0101000020E6100000F4FDD478E9862E40D49AE61DA7B04DC0	-14.6799999999999997
+1042513	2016-12-06 10:26:46.21776+00	0101000020E61000004182E2C7987B2E40105839B4C8AE4DC0	-14.4849999999999994
+1042514	2016-12-06 10:26:46.257275+00	0101000020E61000001C7C613255702E40E9B7AF03E7AC4DC0	-14.2249999999999996
+1042515	2016-12-06 10:26:46.275664+00	0101000020E610000069006F8104652E40C217265305AB4DC0	-15.1699999999999999
+1042516	2016-12-06 10:26:46.320898+00	0101000020E6100000D26F5F07CE592E409A779CA223A94DC0	-15.7650000000000006
+1042517	2016-12-06 10:26:46.346241+00	0101000020E6100000AD69DE718A4E2E4073D712F241A74DC0	-16.6550000000000011
+1042518	2016-12-06 10:26:46.367404+00	0101000020E610000017D9CEF753432E404C37894160A54DC0	-16.879999999999999
+1042519	2016-12-06 10:26:46.401442+00	0101000020E6100000BEC1172653852E40280F0BB5A6B94DC0	-20.0549999999999997
+1042520	2016-12-06 10:26:46.4307+00	0101000020E610000058CA32C4B16E2E4004E78C28EDB54DC0	-19.8500000000000014
+1042521	2016-12-06 10:26:46.417159+00	0101000020E61000000B462575027A2E40C7293A92CBB74DC0	-20.0799999999999983
+1042522	2016-12-06 10:26:46.46771+00	0101000020E6100000A54E401361632E4040A4DFBE0EB44DC0	-20.1050000000000004
+1042523	2016-12-06 10:26:46.492297+00	0101000020E61000008048BF7D1D582E401904560E2DB24DC0	-20.4499999999999993
+1042524	2016-12-06 10:26:46.525391+00	0101000020E61000005B423EE8D94C2E4055C1A8A44EB04DC0	-20.25
+1042525	2016-12-06 10:26:46.532111+00	0101000020E6100000C4B12E6EA3412E40917EFB3A70AE4DC0	-20.120000000000001
+1042526	2016-12-06 10:26:46.576654+00	0101000020E61000002D211FF46C362E406ADE718A8EAC4DC0	-20.3550000000000004
+1042527	2016-12-06 10:26:46.5923+00	0101000020E610000097900F7A362B2E40423EE8D9ACAA4DC0	-20.2049999999999983
+1042528	2016-12-06 10:26:46.626302+00	0101000020E61000008E75711B0D202E407FFB3A70CEA84DC0	-19.8350000000000009
+1042529	2016-12-06 10:26:46.641332+00	0101000020E61000008BFD65F7E4612E4005A3923A01BD4DC0	-25.7749999999999986
+1042530	2016-12-06 10:26:46.674553+00	0101000020E6100000D881734694562E40A5BDC11726BB4DC0	-24.9299999999999997
+1042531	2016-12-06 10:26:46.686305+00	0101000020E6100000B37BF2B0504B2E40E17A14AE47B94DC0	-25.0500000000000007
+1042532	2016-12-06 10:26:46.71852+00	0101000020E61000008E75711B0D402E401D38674469B74DC0	-25.4750000000000014
+1042533	2016-12-06 10:26:46.767636+00	0101000020E6100000F7E461A1D6342E40BD5296218EB54DC0	-25.6799999999999997
+1042534	2016-12-06 10:26:46.776823+00	0101000020E610000061545227A0292E40F90FE9B7AFB34DC0	-25.3249999999999993
+1042535	2016-12-06 10:26:46.794012+00	0101000020E6100000CAC342AD691E2E4036CD3B4ED1B14DC0	-24.1400000000000006
+1042536	2016-12-06 10:26:46.81853+00	0101000020E6100000C1A8A44E40132E400E2DB29DEFAF4DC0	-22.8299999999999983
+1042537	2016-12-06 10:26:46.885048+00	0101000020E61000003EE8D9ACFAFC2D4087A757CA32AC4DC0	-22.0850000000000009
+1042538	2016-12-06 10:26:46.859127+00	0101000020E6100000B98D06F016082E404BEA043411AE4DC0	-22.6600000000000001
+1042539	2016-12-06 10:26:46.89318+00	0101000020E6100000910F7A36AB3E2E401C7C613255C04DC0	-22.625
+1042540	2016-12-06 10:26:46.918635+00	0101000020E61000006C09F9A067332E40BC96900F7ABE4DC0	-22.2800000000000011
+1042541	2016-12-06 10:26:46.96593+00	0101000020E6100000D578E92631282E405BB1BFEC9EBC4DC0	-22.6400000000000006
+1042542	2016-12-06 10:26:46.995925+00	0101000020E61000003EE8D9ACFA1C2E40986E1283C0BA4DC0	-23.0899999999999999
+1042543	2016-12-06 10:26:47.009817+00	0101000020E6100000A857CA32C4112E4037894160E5B84DC0	-23.3449999999999989
+1042544	2016-12-06 10:26:47.020898+00	0101000020E61000009F3C2CD49A062E40744694F606B74DC0	-23.1649999999999991
+1042545	2016-12-06 10:26:47.068986+00	0101000020E610000096218E7571FB2D40B003E78C28B54DC0	-22.6649999999999991
+1042546	2016-12-06 10:26:47.092578+00	0101000020E61000001C7C613255F02D40ECC039234AB34DC0	-22.2349999999999994
+1042547	2016-12-06 10:26:47.122736+00	0101000020E6100000A1D634EF38E52D40287E8CB96BB14DC0	-22.9149999999999991
+1042548	2016-12-06 10:26:47.134445+00	0101000020E6100000273108AC1CDA2D40643BDF4F8DAF4DC0	-22.4149999999999991
+1042549	2016-12-06 10:26:47.167558+00	0101000020E6100000CFF753E3A51B2E40083D9B559FC34DC0	-16.2749999999999986
+1042550	2016-12-06 10:26:47.241679+00	0101000020E6100000386744696F102E40A857CA32C4C14DC0	-16.9499999999999993
+1042551	2016-12-06 10:26:47.257248+00	0101000020E61000001E166A4DF3EE2D4087A757CA32BC4DC0	-18.4800000000000004
+1042552	2016-12-06 10:26:47.251902+00	0101000020E6100000304CA60A46052E404772F90FE9BF4DC0	-16.4600000000000009
+1042553	2016-12-06 10:26:47.25725+00	0101000020E610000099BB96900FFA2D40E78C28ED0DBE4DC0	-16.6950000000000003
+1042554	2016-12-06 10:26:47.317416+00	0101000020E610000016FBCBEEC9E32D4027C286A757BA4DC0	-19.745000000000001
+1042555	2016-12-06 10:26:47.351291+00	0101000020E61000009B559FABADD82D40637FD93D79B84DC0	-20.0700000000000003
+1042556	2016-12-06 10:26:47.376168+00	0101000020E6100000AF25E4839ECD2D40029A081B9EB64DC0	-20.5700000000000003
+1042557	2016-12-06 10:26:47.383036+00	0101000020E6100000C3F5285C8FC22D403F575BB1BFB44DC0	-21.2300000000000004
+1042558	2016-12-06 10:26:47.417278+00	0101000020E6100000D6C56D3480B72D40DE718A8EE4B24DC0	-21.1350000000000016
+1042559	2016-12-06 10:26:47.451147+00	0101000020E610000046B6F3FDD4F82D402D431CEBE2C64DC0	-16.6350000000000016
+1042560	2016-12-06 10:26:47.469428+00	0101000020E61000003D9B559FABED2D4030BB270F0BC54DC0	-17.2800000000000011
+1042561	2016-12-06 10:26:47.501697+00	0101000020E6100000C3F5285C8FE22D40D0D556EC2FC34DC0	-19.0549999999999997
+1042562	2016-12-06 10:26:47.509242+00	0101000020E6100000BADA8AFD65D72D406FF085C954C14DC0	-19.2100000000000009
+1042563	2016-12-06 10:26:47.560891+00	0101000020E61000003F355EBA49CC2D400F0BB5A679BF4DC0	-19.5949999999999989
+1042564	2016-12-06 10:26:47.585771+00	0101000020E61000005305A3923AC12D40AF25E4839EBD4DC0	-20.0500000000000007
+1042565	2016-12-06 10:26:47.59941+00	0101000020E610000067D5E76A2BB62D404F401361C3BB4DC0	-20.0650000000000013
+1042566	2016-12-06 10:26:47.608579+00	0101000020E61000007AA52C431CAB2D40EE5A423EE8B94DC0	-21.2399999999999984
+1042567	2016-12-06 10:26:47.660356+00	0101000020E610000030BB270F0B952D40CA32C4B12EB64DC0	-21.5399999999999991
+1042568	2016-12-06 10:26:47.649695+00	0101000020E61000008E75711B0DA02D408E75711B0DB84DC0	-21.7699999999999996
+1042569	2016-12-06 10:26:47.699007+00	0101000020E610000083C0CAA145D62D408A8EE4F21FCA4DC0	-26.4100000000000001
+1042570	2016-12-06 10:26:47.709449+00	0101000020E6100000091B9E5E29CB2D408E06F01648C84DC0	-27.0399999999999991
+1042571	2016-12-06 10:26:47.742555+00	0101000020E61000008E75711B0DC02D402D211FF46CC64DC0	-28.7250000000000014
+1042572	2016-12-06 10:26:47.76556+00	0101000020E610000014D044D8F0B42D4031992A1895C44DC0	-29.879999999999999
+1042573	2016-12-06 10:26:47.800403+00	0101000020E610000027A089B0E1A92D40D0B359F5B9C24DC0	-29.9849999999999994
+1042574	2016-12-06 10:26:47.815809+00	0101000020E61000003B70CE88D29E2D40D42B6519E2C04DC0	-30.0199999999999996
+1042575	2016-12-06 10:26:47.833074+00	0101000020E6100000DDB5847CD0932D40744694F606BF4DC0	-30.495000000000001
+1042576	2016-12-06 10:26:47.882196+00	0101000020E61000007FFB3A70CE882D401361C3D32BBD4DC0	-31.0549999999999997
+1042577	2016-12-06 10:26:47.900298+00	0101000020E61000002041F163CC7D2D40B37BF2B050BB4DC0	-30.5199999999999996
+1042578	2016-12-06 10:26:47.90779+00	0101000020E610000050FC1873D7722D405396218E75B94DC0	-29.620000000000001
+\.
+
+
+--
+-- Name: world_sstday_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('world_sstday_id_seq', 1042578, true);
+
+
+--
+-- Data for Name: world_worldborder; Type: TABLE DATA; Schema: public; Owner: ocean
+--
+
+COPY world_worldborder (id, name, area, pop2005, fips, iso2, iso3, un, region, subregion, lon, lat, mpoly) FROM stdin;
+\.
+
+
+--
+-- Name: world_worldborder_id_seq; Type: SEQUENCE SET; Schema: public; Owner: ocean
+--
+
+SELECT pg_catalog.setval('world_worldborder_id_seq', 1, false);
+
+
+SET search_path = tiger, pg_catalog;
+
+--
+-- Data for Name: geocode_settings; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY geocode_settings  FROM stdin;
+\.
+
+
+--
+-- Data for Name: pagc_gaz; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY pagc_gaz  FROM stdin;
+\.
+
+
+--
+-- Data for Name: pagc_lex; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY pagc_lex  FROM stdin;
+\.
+
+
+--
+-- Data for Name: pagc_rules; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY pagc_rules  FROM stdin;
+\.
+
+
+SET search_path = topology, pg_catalog;
+
+--
+-- Data for Name: topology; Type: TABLE DATA; Schema: topology; Owner: postgres
+--
+
+COPY topology  FROM stdin;
+\.
+
+
+--
+-- Data for Name: layer; Type: TABLE DATA; Schema: topology; Owner: postgres
+--
+
+COPY layer  FROM stdin;
+\.
+
+
+SET search_path = public, pg_catalog;
+
+--
+-- Name: auth_group_name_key; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_group
+    ADD CONSTRAINT auth_group_name_key UNIQUE (name);
+
+
+--
+-- Name: auth_group_permissions_group_id_0cd325b0_uniq; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_0cd325b0_uniq UNIQUE (group_id, permission_id);
+
+
+--
+-- Name: auth_group_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_group_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_group
+    ADD CONSTRAINT auth_group_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_permission_content_type_id_01ab375a_uniq; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_permission
+    ADD CONSTRAINT auth_permission_content_type_id_01ab375a_uniq UNIQUE (content_type_id, codename);
+
+
+--
+-- Name: auth_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_permission
+    ADD CONSTRAINT auth_permission_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user_groups
+    ADD CONSTRAINT auth_user_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_user_groups_user_id_94350c0c_uniq; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user_groups
+    ADD CONSTRAINT auth_user_groups_user_id_94350c0c_uniq UNIQUE (user_id, group_id);
+
+
+--
+-- Name: auth_user_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user
+    ADD CONSTRAINT auth_user_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_user_user_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user_user_permissions
+    ADD CONSTRAINT auth_user_user_permissions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_user_user_permissions_user_id_14a6b632_uniq; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user_user_permissions
+    ADD CONSTRAINT auth_user_user_permissions_user_id_14a6b632_uniq UNIQUE (user_id, permission_id);
+
+
+--
+-- Name: auth_user_username_key; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user
+    ADD CONSTRAINT auth_user_username_key UNIQUE (username);
+
+
+--
+-- Name: django_admin_log_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY django_admin_log
+    ADD CONSTRAINT django_admin_log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_content_type_app_label_76bd3d3b_uniq; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY django_content_type
+    ADD CONSTRAINT django_content_type_app_label_76bd3d3b_uniq UNIQUE (app_label, model);
+
+
+--
+-- Name: django_content_type_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY django_content_type
+    ADD CONSTRAINT django_content_type_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY django_migrations
+    ADD CONSTRAINT django_migrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: django_session_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY django_session
+    ADD CONSTRAINT django_session_pkey PRIMARY KEY (session_key);
+
+
+--
+-- Name: world_region_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY world_region
+    ADD CONSTRAINT world_region_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: world_sstday_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY world_sstday
+    ADD CONSTRAINT world_sstday_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: world_sstday_point_36d2d0f3_uniq; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY world_sstday
+    ADD CONSTRAINT world_sstday_point_36d2d0f3_uniq UNIQUE (point);
+
+
+--
+-- Name: world_worldborder_pkey; Type: CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY world_worldborder
+    ADD CONSTRAINT world_worldborder_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: auth_group_name_a6ea08ec_like; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX auth_group_name_a6ea08ec_like ON auth_group USING btree (name varchar_pattern_ops);
+
+
+--
+-- Name: auth_group_permissions_0e939a4f; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX auth_group_permissions_0e939a4f ON auth_group_permissions USING btree (group_id);
+
+
+--
+-- Name: auth_group_permissions_8373b171; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX auth_group_permissions_8373b171 ON auth_group_permissions USING btree (permission_id);
+
+
+--
+-- Name: auth_permission_417f1b1c; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX auth_permission_417f1b1c ON auth_permission USING btree (content_type_id);
+
+
+--
+-- Name: auth_user_groups_0e939a4f; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX auth_user_groups_0e939a4f ON auth_user_groups USING btree (group_id);
+
+
+--
+-- Name: auth_user_groups_e8701ad4; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX auth_user_groups_e8701ad4 ON auth_user_groups USING btree (user_id);
+
+
+--
+-- Name: auth_user_user_permissions_8373b171; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX auth_user_user_permissions_8373b171 ON auth_user_user_permissions USING btree (permission_id);
+
+
+--
+-- Name: auth_user_user_permissions_e8701ad4; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX auth_user_user_permissions_e8701ad4 ON auth_user_user_permissions USING btree (user_id);
+
+
+--
+-- Name: auth_user_username_6821ab7c_like; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX auth_user_username_6821ab7c_like ON auth_user USING btree (username varchar_pattern_ops);
+
+
+--
+-- Name: django_admin_log_417f1b1c; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX django_admin_log_417f1b1c ON django_admin_log USING btree (content_type_id);
+
+
+--
+-- Name: django_admin_log_e8701ad4; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX django_admin_log_e8701ad4 ON django_admin_log USING btree (user_id);
+
+
+--
+-- Name: django_session_de54fa62; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX django_session_de54fa62 ON django_session USING btree (expire_date);
+
+
+--
+-- Name: django_session_session_key_c0390e0f_like; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX django_session_session_key_c0390e0f_like ON django_session USING btree (session_key varchar_pattern_ops);
+
+
+--
+-- Name: world_region_2dbcba41; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX world_region_2dbcba41 ON world_region USING btree (slug);
+
+
+--
+-- Name: world_region_poly_id; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX world_region_poly_id ON world_region USING gist (poly);
+
+
+--
+-- Name: world_region_slug_a6ffbbd7_like; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX world_region_slug_a6ffbbd7_like ON world_region USING btree (slug varchar_pattern_ops);
+
+
+--
+-- Name: world_sstday_point_id; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX world_sstday_point_id ON world_sstday USING gist (point);
+
+
+--
+-- Name: world_worldborder_mpoly_id; Type: INDEX; Schema: public; Owner: ocean
+--
+
+CREATE INDEX world_worldborder_mpoly_id ON world_worldborder USING gist (mpoly);
+
+
+--
+-- Name: auth_group_permiss_permission_id_84c5c92e_fk_auth_permission_id; Type: FK CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_group_permissions
+    ADD CONSTRAINT auth_group_permiss_permission_id_84c5c92e_fk_auth_permission_id FOREIGN KEY (permission_id) REFERENCES auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_group_permissions_group_id_b120cbf9_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_group_permissions
+    ADD CONSTRAINT auth_group_permissions_group_id_b120cbf9_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_permiss_content_type_id_2f476e4b_fk_django_content_type_id; Type: FK CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_permission
+    ADD CONSTRAINT auth_permiss_content_type_id_2f476e4b_fk_django_content_type_id FOREIGN KEY (content_type_id) REFERENCES django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_user_groups_group_id_97559544_fk_auth_group_id; Type: FK CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user_groups
+    ADD CONSTRAINT auth_user_groups_group_id_97559544_fk_auth_group_id FOREIGN KEY (group_id) REFERENCES auth_group(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_user_groups_user_id_6a12ed8b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user_groups
+    ADD CONSTRAINT auth_user_groups_user_id_6a12ed8b_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_user_user_per_permission_id_1fbb5f2c_fk_auth_permission_id; Type: FK CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user_user_permissions
+    ADD CONSTRAINT auth_user_user_per_permission_id_1fbb5f2c_fk_auth_permission_id FOREIGN KEY (permission_id) REFERENCES auth_permission(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY auth_user_user_permissions
+    ADD CONSTRAINT auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_content_type_id_c4bce8eb_fk_django_content_type_id; Type: FK CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY django_admin_log
+    ADD CONSTRAINT django_admin_content_type_id_c4bce8eb_fk_django_content_type_id FOREIGN KEY (content_type_id) REFERENCES django_content_type(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: django_admin_log_user_id_c564eba6_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: ocean
+--
+
+ALTER TABLE ONLY django_admin_log
+    ADD CONSTRAINT django_admin_log_user_id_c564eba6_fk_auth_user_id FOREIGN KEY (user_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\connect postgres
+
+SET default_transaction_read_only = off;
+
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.5.5
+-- Dumped by pg_dump version 9.5.5
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: postgres; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON DATABASE postgres IS 'default administrative connection database';
+
+
+--
+-- Name: tiger; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA tiger;
+
+
+ALTER SCHEMA tiger OWNER TO postgres;
+
+--
+-- Name: tiger_data; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA tiger_data;
+
+
+ALTER SCHEMA tiger_data OWNER TO postgres;
+
+--
+-- Name: topology; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA topology;
+
+
+ALTER SCHEMA topology OWNER TO postgres;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
+
+
+--
+-- Name: postgis; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION postgis IS 'PostGIS geometry, geography, and raster spatial types and functions';
+
+
+--
+-- Name: postgis_tiger_geocoder; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder WITH SCHEMA tiger;
+
+
+--
+-- Name: EXTENSION postgis_tiger_geocoder; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION postgis_tiger_geocoder IS 'PostGIS tiger geocoder and reverse geocoder';
+
+
+--
+-- Name: postgis_topology; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
+
+
+--
+-- Name: EXTENSION postgis_topology; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION postgis_topology IS 'PostGIS topology spatial types and functions';
+
+
+SET search_path = public, pg_catalog;
+
+--
+-- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY spatial_ref_sys  FROM stdin;
+\.
+
+
+SET search_path = tiger, pg_catalog;
+
+--
+-- Data for Name: geocode_settings; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY geocode_settings  FROM stdin;
+\.
+
+
+--
+-- Data for Name: pagc_gaz; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY pagc_gaz  FROM stdin;
+\.
+
+
+--
+-- Data for Name: pagc_lex; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY pagc_lex  FROM stdin;
+\.
+
+
+--
+-- Data for Name: pagc_rules; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY pagc_rules  FROM stdin;
+\.
+
+
+SET search_path = topology, pg_catalog;
+
+--
+-- Data for Name: topology; Type: TABLE DATA; Schema: topology; Owner: postgres
+--
+
+COPY topology  FROM stdin;
+\.
+
+
+--
+-- Data for Name: layer; Type: TABLE DATA; Schema: topology; Owner: postgres
+--
+
+COPY layer  FROM stdin;
+\.
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\connect template1
+
+SET default_transaction_read_only = off;
+
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.5.5
+-- Dumped by pg_dump version 9.5.5
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: template1; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON DATABASE template1 IS 'default template for new databases';
+
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+\connect template_postgis
+
+SET default_transaction_read_only = off;
+
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.5.5
+-- Dumped by pg_dump version 9.5.5
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: tiger; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA tiger;
+
+
+ALTER SCHEMA tiger OWNER TO postgres;
+
+--
+-- Name: tiger_data; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA tiger_data;
+
+
+ALTER SCHEMA tiger_data OWNER TO postgres;
+
+--
+-- Name: topology; Type: SCHEMA; Schema: -; Owner: postgres
+--
+
+CREATE SCHEMA topology;
+
+
+ALTER SCHEMA topology OWNER TO postgres;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+--
+-- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
+
+
+--
+-- Name: postgis; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION postgis; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION postgis IS 'PostGIS geometry, geography, and raster spatial types and functions';
+
+
+--
+-- Name: postgis_tiger_geocoder; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder WITH SCHEMA tiger;
+
+
+--
+-- Name: EXTENSION postgis_tiger_geocoder; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION postgis_tiger_geocoder IS 'PostGIS tiger geocoder and reverse geocoder';
+
+
+--
+-- Name: postgis_topology; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
+
+
+--
+-- Name: EXTENSION postgis_topology; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION postgis_topology IS 'PostGIS topology spatial types and functions';
+
+
+SET search_path = public, pg_catalog;
+
+--
+-- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY spatial_ref_sys  FROM stdin;
+\.
+
+
+SET search_path = tiger, pg_catalog;
+
+--
+-- Data for Name: geocode_settings; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY geocode_settings  FROM stdin;
+\.
+
+
+--
+-- Data for Name: pagc_gaz; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY pagc_gaz  FROM stdin;
+\.
+
+
+--
+-- Data for Name: pagc_lex; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY pagc_lex  FROM stdin;
+\.
+
+
+--
+-- Data for Name: pagc_rules; Type: TABLE DATA; Schema: tiger; Owner: postgres
+--
+
+COPY pagc_rules  FROM stdin;
+\.
+
+
+SET search_path = topology, pg_catalog;
+
+--
+-- Data for Name: topology; Type: TABLE DATA; Schema: topology; Owner: postgres
+--
+
+COPY topology  FROM stdin;
+\.
+
+
+--
+-- Data for Name: layer; Type: TABLE DATA; Schema: topology; Owner: postgres
+--
+
+COPY layer  FROM stdin;
+\.
+
+
+--
+-- Name: public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+--
+-- PostgreSQL database cluster dump complete
+--
+

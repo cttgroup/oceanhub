@@ -1,0 +1,5 @@
+build-temp/
+build-*
+ncparse
+Makefile
+modisnetcdf2sql.pro.user
