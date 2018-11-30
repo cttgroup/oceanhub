@@ -2,11 +2,9 @@
 layout: default
 ---
 
+<img src="./assets/logomd.png" /><br /><br />
 <div class="home">
-
-  <h1 class="page-heading"></h1>
-
-  <img src="./assets/logomd.png" /><br /><br />
+  <h1 class="page-heading">Блог</h1>
 
   <ul class="post-list">
     {% for post in site.posts %}
@@ -22,6 +20,6 @@ layout: default
 
   {{ content }}
 
-  {% include index.markdown %}
+  {% include index.html %}
 
 </div>

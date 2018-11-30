@@ -1,0 +1,9 @@
+# Операции с Postgres
+
+pg_dumpall -U postgres > /backup/ocean
+
+psql -U postgres -f infile postgres
+psql -U postgres -f ./backup/port_init postgres
+psql -U postgres -f /backup/ocean postgres
+
+dropdb -U postgres ocean && psql -U postgres -f /backup/ocean postgres

@@ -8,14 +8,15 @@
       <div class="footer-col footer-col-1">
         <ul class="contact-list">
           <li>
-            <a href="https://github.com/cttgroup/oceanhub">
-              {% include icon-github.svg %}
-              {% if site.author %}
-              {% else %}
-                {{ site.title | escape }}
-              {% endif %}
-            </a>
-          </li>
+            {% if site.author %}
+              {{ site.author | escape }}
+            {% else %}
+              {{ site.title | escape }}
+            {% endif %}
+            </li>
+            {% if site.email %}
+            <li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+            {% endif %}
         </ul>
       </div>
 
@@ -36,7 +37,7 @@
       </div>
 
       <div class="footer-col footer-col-3">
-        <p>Поиск и идентификация в океане крупных скоплений промысловой рыбы с применением ДЗЗ{{ site.description | escape }}</p>
+        <p>{{ site.description | escape }}</p>
       </div>
     </div>
 

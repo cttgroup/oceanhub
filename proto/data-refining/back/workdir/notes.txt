@@ -1,0 +1,40 @@
+SELECT *
+FROM ocean_temperature
+WHERE datetime
+	BETWEEN '2016-09-01 00:00:00'
+	AND '2016-09-01 23:00:00';
+
+CLUSTER ocean_temperature USING datetime;
+
+
+pypy -m celery -A app worker --loglevel=INFO --concurrency=10 -n worker1@%h
+pypy -m celery -A app worker --loglevel=INFO --concurrency=10 -n worker2@%h
+pypy -m celery -A app worker --loglevel=INFO --concurrency=10 -n worker3@%h
+pypy -m celery -A app worker --loglevel=INFO --concurrency=10 -n worker4@%h
+
+
+pypy -m celery -A app worker -l info
+
+celery -A app worker -l info
+celery -A app beat -l info
+
+celery -A app worker --loglevel=info
+celery -A app purge
+redis-cli -h redis ping
+redis-cli -h backredis config set stop-writes-on-bgsave-error no
+
+supervisord -c /etc/supervisor/supervisord.conf
+supervisorctl reread
+supervisorctl update
+supervisorctl stop appcelery
+supervisorctl start appcelery
+supervisorctl status appcelery
+
+
+celery -A app worker --loglevel=INFO --concurrency=10 -n worker1@%h
+celery -A app worker --loglevel=INFO --concurrency=10 -n worker2@%h
+celery -A app worker --loglevel=INFO --concurrency=10 -n worker3@%h
+celery -A app worker --loglevel=INFO --concurrency=10 -n worker4@%h
+
+celery -A app worker --loglevel=INFO --concurrency=2 -n worker1@%h
+celery -A app worker --loglevel=INFO --concurrency=4 -n worker2@%h

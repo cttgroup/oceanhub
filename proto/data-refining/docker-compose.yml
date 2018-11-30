@@ -1,0 +1,108 @@
+version: '2'
+services:
+  backdjango:
+    container_name: ocean_backdjango
+    dns_search:
+      - ocean.dev16.int
+    extra_hosts:
+      - "ocean:10.216.175.4"
+    build: ./back/django/.
+    ports:
+      - "21018:8000"
+    volumes:
+      - ./back/workdir:/workdir
+      - ./volumes/data:/data
+    # command: /bin/bash fake-daemon.sh
+    command: /bin/bash dev.sh
+    # command: python manage.py runserver 0.0.0.0:8000
+    # You can use fake-daemon.sh daemon script for better project debugging:
+    # 1) comment - command: python manage.py runserver 0.0.0.0:8000
+    # 2) uncomment - command: /bin/bash fake-daemon.sh
+    # 3) run - docker exec -it [your_django_container] /bin/bash
+    # 4) run - ./manage.py runserver 0.0.0.0:8000
+    links:
+      - backpostgis
+      - backredis
+      - backmemcached
+  backpostgis:
+    container_name: ocean_backpostgis
+    build: ./back/postgis/.
+    ports:
+      - "21015:5432"
+    volumes:
+      - ./volumes/postgis:/var/lib/postgresql/data
+      - ./back/postgis/backup:/backup
+  backredis:
+    container_name: ocean_backredis
+    build: ./back/redis/.
+    volumes:
+      - ./volumes/redis:/data
+    command: redis-server
+  backmemcached:
+    container_name: ocean_backmemcached
+    build: ./back/memcached/.
+    command: memcached -m 1024m -I 128m
+  backnginx:
+    container_name: ocean_backnginx
+    build: ./back/nginx/.
+    ports:
+      - "21010:80"
+    volumes:
+      - ./back/workdir:/workdir
+      - ./volumes/data:/data
+    command: /bin/bash fake-daemon.sh
+    links:
+      - backpostgis
+      - backredis
+  backextras:
+    container_name: ocean_backextras
+    build: ./back/extras/.
+    volumes:
+      - ./back/workdir:/workdir
+      - ./volumes/data:/data
+    command: /bin/bash fake-daemon.sh
+
+
+  frontnodejs:
+    container_name: ocean_frontnodejs
+    build:
+      context: ./front
+      dockerfile: ./nodejs/Dockerfile
+    volumes:
+      - ./front/workdir:/workdir
+    ports:
+      - "21023:21023"
+    # command: /bin/sh -c "while true; do echo faking daemon; sleep 60; done"
+    command: /bin/bash dev.sh
+    depends_on:
+      - backdjango
+
+
+  crabberdjango:
+    container_name: ocean_crabberdjango
+    build: ./crabber/django/.
+    ports:
+      - "21098:8000"
+    volumes:
+      - ./crabber/workdir:/workdir
+      - ./volumes/data:/data
+    command: /bin/bash dev.sh
+    # command: supervisord -n
+    # command: nginx && uwsgi --ini /workdir/app_uwsgi.ini
+    links:
+      - crabberredis
+  crabberredis:
+    container_name: ocean_crabberredis
+    build: ./crabber/redis/.
+    volumes:
+      - ./volumes/crabberredis:/data
+    command: redis-server
+  crabbercelery:
+    container_name: ocean_crabbercelery
+    build: ./crabber/celery/.
+    volumes:
+      - ./crabber/workdir:/workdir
+    # command: /bin/bash fake-daemon.sh
+    command: supervisord -n
+    links:
+      - crabberredis

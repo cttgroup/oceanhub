@@ -14,28 +14,30 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: Океан
-email: ocean@domain.com
+# email: ocean@domain.com
 description: > # this means to ignore newlines until "baseurl:"
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/oceanhub"
+# baseurl: ""
+url: "https://cttgroup.github.io"
+# url: ""
 github_username:  cttgroup
 
 # Build settings
 markdown: kramdown
-theme: minima
+# theme: minima
 # theme: jekyll-theme-cayman
-gems:
-  - jekyll-feed
-  - jekyll-github-comments
+plugins:
+  # - jekyll-feed
+  # - jekyll-github-comments
 exclude:
   - Gemfile
   - Gemfile.lock
-  - rundev.sh
+  - dev.sh
   - fake-daemon.sh
   - _src/
 # plugins_dir: [jekyll-github-comments]
-github_comments:
-  repo: cttgroup/oceanhub
+# github_comments:
+# repo: cttgroup/oceanhuben
   # branch: master
   # comment_template: comments.html
   # comments_template: comments.html
